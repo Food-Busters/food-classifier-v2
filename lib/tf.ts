@@ -1,5 +1,4 @@
-import * as tf from "@tensorflow/tfjs";
-import * as tfnode from "@tensorflow/tfjs-node";
+import { loadGraphModel, node, image, dispose } from "@tensorflow/tfjs-node";
 
 const labelMap = {
   1: "Omelet Rice",
@@ -14,14 +13,14 @@ export interface MLResult {
 }
 
 export async function getMLResult(img: string) {
-  const net = await tf.loadGraphModel(
+  const net = await loadGraphModel(
     "https://foodbuster.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json"
   );
 
-  const decodedImage = tfnode.node.decodeImage(
+  const decodedImage = node.decodeImage(
     Buffer.from(img.replace(/^data:image\/.+;base64,/, ""), "base64")
   );
-  const transformed = tf.image
+  const transformed = image
     .resizeBilinear(decodedImage, [640, 480])
     .cast("int32")
     .expandDims(0);
@@ -32,9 +31,9 @@ export async function getMLResult(img: string) {
     score: (await obj[2].array())[0][0],
   };
 
-  tf.dispose(decodedImage);
-  tf.dispose(transformed);
-  tf.dispose(obj);
+  dispose(decodedImage);
+  dispose(transformed);
+  dispose(obj);
 
   return result;
 }
