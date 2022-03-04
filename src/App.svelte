@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { MLResult } from "../lib/tf";
+  import type { MLResult, FoodNutrition } from "./types";
 
   import { Version } from "./config";
 
@@ -9,6 +9,7 @@
   let showImage = false;
   let submited = false;
   let imageData = "";
+  let time = 0;
 
   let result: MLResult | APIError | undefined = undefined;
 
@@ -18,7 +19,7 @@
   }
 
   function isSuccess(obj: MLResult | APIError): obj is MLResult {
-    return (obj as MLResult).type != undefined;
+    return (obj as MLResult).foodName != undefined;
   }
 
   function onImgChange() {
@@ -45,19 +46,37 @@
 
     submited = true;
 
-    const obj = await fetch("/api/classify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "app-version": `web-${Version.split(".")[2]}`,
-        token: import.meta.env.VITE_API_TOKEN as string,
-      },
-      body: JSON.stringify({
-        image: imageData,
-      }),
-    });
+    let start = performance.now();
 
-    result = await obj.json();
+    try {
+      const obj = await fetch(import.meta.env.VITE_API_ENDPOINT as string, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          version: `web-${Version.split(".")[2]}`,
+          token: import.meta.env.VITE_API_TOKEN as string,
+        },
+        body: JSON.stringify({
+          image: imageData,
+        }),
+      });
+
+      try {
+        result = await obj.json();
+      } catch (err) {
+        result = {
+          message: "Server throw Unexpected Response",
+          error: 500,
+        };
+      }
+    } catch (err) {
+      result = {
+        message: `Cannot Fetch API : ${err}`,
+        error: 503,
+      };
+    }
+
+    time = Math.round(performance.now() - start);
   }
 </script>
 
@@ -66,7 +85,7 @@
 <main
   class="flex flex-col gap-4 w-1/2 2xl:w-1/3 mx-auto p-4 pb-6 shadow-xl bg-white rounded-xl text-center"
 >
-  <h1 class="font-bold big-p">Amazing Food Classifier</h1>
+  <h1 class="font-bold big-p">Amazing Food Classifier {Version}</h1>
   <hr />
   <div class="flex flex-row justify-center items-baseline gap-2">
     <label for="image" class="font-bold text-2xl">Your Image:</label>
@@ -92,9 +111,24 @@
   {#if submited}
     {#if result}
       {#if isSuccess(result)}
-        <p class="text-2xl xl:text-4xl">The amazing AI says this picture is</p>
-        <p>✨{result.type ?? "Loading..."}✨</p>
-        <p>{(result.score ?? 0) * 100}% sure!</p>
+        <p class="text-2xl xl:text-4xl">
+          The amazing AI {result.version} says this picture is
+        </p>
+        <p>✨{result.foodName ?? "Loading..."}✨</p>
+        <p>{Math.round(result.score * 10000) / 100}% sure!</p>
+        <p>It took {time} ms, is that too long?</p>
+
+        <p>🤩Food Nutrition🤩</p>
+        <table class="table-fixed mx-4 xl:w-1/2 xl:mx-auto">
+          <tr><th>Food</th><th>Percent</th></tr>
+
+          {#each Object.entries(result.foodNutrition) as [name, percent]}
+            <tr>
+              <td>{name[0].toUpperCase() + name.slice(1)}</td>
+              <td>{percent}</td>
+            </tr>
+          {/each}
+        </table>
       {:else}
         <p class="big-p text-red-600">Error {result.error}: {result.message}</p>
       {/if}
@@ -111,5 +145,13 @@
 
   .big-p {
     @apply text-2xl xl:text-4xl;
+  }
+
+  th {
+    @apply text-xl text-left;
+  }
+
+  td {
+    @apply text-lg text-left;
   }
 </style>
