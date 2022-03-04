@@ -1,3 +1,5 @@
-**Edit**: Do not work, Tensorflow is too *t h i c c* for Vercel Free Tier,
+# Food Classifier
 
-And TrueMoney WeCard cannot be used to sign up AWS or Azure
+Try our Smart Food Scanner without App
+
+Backend is run using [Azure Functions](https://github.com/Food-Busters/azure-functions)
