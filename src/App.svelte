@@ -97,6 +97,7 @@
     on:change={(e) => {
       modelOption = e.currentTarget.value;
       submited = false;
+      result = undefined;
     }}
   >
     <option value="P">Model P</option>
