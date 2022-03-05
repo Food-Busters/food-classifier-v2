@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { MLResult, FoodNutrition } from "./types";
+  import type { MLResult } from "./types";
 
   import { Version } from "./config";
 
@@ -8,6 +8,7 @@
 
   let showImage = false;
   let submited = false;
+  let modelOption = "P";
   let imageData = "";
   let time = 0;
 
@@ -54,9 +55,9 @@
         headers: {
           "Content-Type": "application/json",
           version: `web-${Version.split(".")[2]}`,
-          token: import.meta.env.VITE_API_TOKEN as string,
         },
         body: JSON.stringify({
+          modelType: modelOption,
           image: imageData,
         }),
       });
@@ -83,7 +84,7 @@
 <img class="mx-auto mb-5" src="redsomwua.webp" alt="Somwua" width="200" />
 
 <main
-  class="flex flex-col gap-4 w-full sm:w-2/3 md:w-1/2 2xl:w-1/3 mx-auto p-4 pb-6 shadow-xl bg-white rounded-xl text-center"
+  class="flex flex-col gap-4 items-center w-full sm:w-2/3 md:w-1/2 2xl:w-1/3 mx-auto p-4 pb-6 shadow-xl bg-white rounded-xl text-center"
 >
   <h1 class="font-bold big-p">Amazing Food Classifier {Version}</h1>
   <hr />
@@ -91,6 +92,16 @@
     <label for="image" class="font-bold text-2xl">Your Image:</label>
     <input type="file" accept="image/*" bind:files on:change={onImgChange} />
   </div>
+  <select
+    class="w-auto font-bold text-xl"
+    on:change={(e) => {
+      modelOption = e.currentTarget.value;
+      submited = false;
+    }}
+  >
+    <option value="P">Model P</option>
+    <option value="U">Model U</option>
+  </select>
 
   {#if showImage}
     <p>Image Preview</p>
@@ -115,7 +126,7 @@
           The amazing AI {result.version} says this picture is
         </p>
         <p>✨{result.foodName ?? "Loading..."}✨</p>
-        <p>{Math.round(result.score * 10000) / 100}% sure!</p>
+        <p>{Math.round(result.confidence * 10000) / 100}% sure!</p>
         <p>It took {time} ms, is that too long?</p>
 
         <p>🤩Food Nutrition🤩</p>
