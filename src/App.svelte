@@ -126,7 +126,7 @@
         <p class="text-2xl xl:text-4xl">
           The amazing AI {result.version} says this picture is
         </p>
-        <p>✨{result.foodName ?? "Loading..."}✨</p>
+        <p>✨{result.foodName.en} / {result.foodName.th}✨</p>
         <p>{Math.round(result.confidence * 10000) / 100}% sure!</p>
         <p>It took {time} ms, is that too long?</p>
 
