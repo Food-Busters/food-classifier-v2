@@ -132,15 +132,20 @@
 
         <p>🤩Food Nutrition🤩</p>
         <table class="table-fixed mx-4 xl:w-1/2 xl:mx-auto">
-          <tr><th>Food</th><th>Percent</th></tr>
+          <tr><th>Nutrition</th><th>Calories</th></tr>
 
-          {#each Object.entries(result.foodNutrition) as [name, percent]}
-            <tr>
-              <td>{name[0].toUpperCase() + name.slice(1)}</td>
-              <td>{percent}</td>
-            </tr>
+          {#each Object.entries(result.foodNutrition) as [name, calo]}
+            {#if name != "pollution"}
+              <tr>
+                <td>{name[0].toUpperCase() + name.slice(1)}</td>
+                <td>{calo}</td>
+              </tr>
+            {/if}
           {/each}
         </table>
+        <p>
+          Pollution by this food is {result.foodNutrition.pollution} grams of CO₂
+        </p>
       {:else}
         <p class="big-p text-red-600">Error {result.error}: {result.message}</p>
       {/if}
