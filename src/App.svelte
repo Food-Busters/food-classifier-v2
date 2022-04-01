@@ -81,7 +81,7 @@
   }
 </script>
 
-<img class="mx-auto mb-5" src="redsomwua.webp" alt="Somwua" width="200" />
+<img class="mx-auto mb-5" src="somwua.webp" alt="Somwua" width="200" />
 
 <main
   class="flex flex-col gap-4 items-center w-full sm:w-2/3 md:w-1/2 2xl:w-1/3 mx-auto p-4 pb-6 shadow-xl bg-white rounded-xl text-center"
